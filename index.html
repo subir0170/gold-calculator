@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GoldCalc Premium - Subir Datta</title>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #FFD700;
+            --bg: #0F0F0F;
+            --card: #1A1A1A;
+            --input-bg: #262626;
+            --text: #F0F0F0;
+            --accent: #FFD700;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            border: 1px solid #333;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            color: var(--gold);
+            text-align: center;
+            font-size: 22px;
+            margin: 5px 0 20px 0;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 5px;
+            font-size: 11px;
+            border: 1px solid #444;
+            background: transparent;
+            color: #aaa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--gold);
+            color: #000;
+            font-weight: bold;
+            border-color: var(--gold);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            color: var(--gold-light);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+            background: #2D2D2D;
+        }
+
+        .grid-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .grid-row .input-group {
+            flex: 1 1 calc(50% - 6px);
+        }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .result-box {
+            background: linear-gradient(145deg, #222, #111);
+            padding: 25px 15px;
+            border-radius: 15px;
+            border: 1px solid var(--gold);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .res-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #bbb;
+        }
+
+        .res-val {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .grand-total-val {
+            font-size: 32px;
+            font-weight: 900;
+            color: #fff;
+            display: block;
+            margin-top: 5px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-copy {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #AA8A2E, var(--gold));
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #000;
+            margin-top: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* Standard Calculator UI */
+        .calc-screen {
+            background: #000;
+            color: var(--gold-light);
+            width: 100%;
+            height: 60px;
+            text-align: right;
+            padding: 10px;
+            font-size: 24px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            padding: 15px;
+            background: #262626;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .calc-btn.op { color: var(--gold); font-weight: bold; }
+        .calc-btn.equal { background: var(--gold); color: black; grid-column: span 2; }
+
+        /* Converter Layout with Copy Button */
+        .conv-title {
+            font-size: 13px;
+            color: var(--gold);
+            margin: 15px 0 10px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+            display: block;
+        }
+
+        .conv-res-wrapper {
+            position: relative;
+            margin-top: 5px;
+        }
+
+        .conv-res-box {
+            background: #222;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px dashed #444;
+            padding-right: 50px; /* Space for icon */
+        }
+
+        .conv-res-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--gold-light);
+        }
+
+        .mini-copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #333;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 5px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .mini-copy-btn:active { background: var(--gold); color: #000; }
+
+        footer {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: auto;
+            padding-bottom: 20px;
+        }
+
+        footer strong { color: var(--gold); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header"><h2>GoldCalc Premium</h2></div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('vory-mode')">ভরি-আনা</button>
+        <button class="tab-btn" onclick="showTab('gram-mode')">গ্রাম মোড</button>
+        <button class="tab-btn" onclick="showTab('conv-mode')">কনভার্টার</button>
+        <button class="tab-btn" onclick="showTab('calc-mode')">ক্যালকুলেটর</button>
+    </div>
+
+    <div id="market-rate-area">
+        <div class="input-group">
+            <label>আজকের বাজার দর (১ ভরি)</label>
+            <input type="number" id="rate" placeholder="উদাঃ 115000" oninput="calculate()">
+        </div>
+    </div>
+
+    <div id="vory-mode" class="section active">
+        <div class="grid-row">
+            <div class="input-group"><label>ভরি</label><input type="number" id="v" placeholder="0" oninput="calculate()"></div>
+            <div class="input-group"><label>আনা</label><input type="number" id="a" placeholder="0" oninput="calculate()"></div>
+            <div class="input-group"><label>রতি</label><input type="number" id="r_t" placeholder="0" oninput="calculate()"></div>
+            <div class="input-group"><label>পয়েন্ট</label><input type="number" id="p" placeholder="0" oninput="calculate()"></div>
+        </div>
+    </div>
+
+    <div id="gram-mode" class="section">
+        <div class="input-group">
+            <label>মোট গ্রাম (Gram)</label>
+            <input type="number" id="g_input" placeholder="0.000" oninput="calculate()">
+        </div>
+    </div>
+
+    <div id="conv-mode" class="section">
+        <span class="conv-title">১. গ্রাম থেকে ভরি (Grams to Vory)</span>
+        <div class="input-group">
+            <input type="number" id="g2v_in" placeholder="গ্রাম লিখুন..." oninput="convertG2V()">
+        </div>
+        <div class="conv-res-wrapper">
+            <div class="conv-res-box">
+                <span id="g2v_out" class="conv-res-text">০-০-০-০</span>
+            </div>
+            <button class="mini-copy-btn" onclick="copyConv('g2v_out')">COPY</button>
+        </div>
+
+        <div style="margin: 20px 0; border-top: 1px double #333;"></div>
+
+        <span class="conv-title">২. ভরি থেকে গ্রাম (Vory to Grams)</span>
+        <div class="grid-row">
+            <div class="input-group"><label>ভরি</label><input type="number" id="cv" placeholder="0" oninput="convertV2G()"></div>
+            <div class="input-group"><label>আনা</label><input type="number" id="ca" placeholder="0" oninput="convertV2G()"></div>
+            <div class="input-group"><label>রতি</label><input type="number" id="cr" placeholder="0" oninput="convertV2G()"></div>
+            <div class="input-group"><label>পয়েন্ট</label><input type="number" id="cp" placeholder="0" oninput="convertV2G()"></div>
+        </div>
+        <div class="conv-res-wrapper">
+            <div class="conv-res-box">
+                <span id="v2g_out" class="conv-res-text">০.০০০ g</span>
+            </div>
+            <button class="mini-copy-btn" onclick="copyConv('v2g_out')">COPY</button>
+        </div>
+    </div>
+
+    <div id="calc-mode" class="section">
+        <div class="calc-screen" id="calc-display">0</div>
+        <div class="calc-grid">
+            <button class="calc-btn op" onclick="clearCalc()">C</button>
+            <button class="calc-btn op" onclick="pressCalc('%')">%</button>
+            <button class="calc-btn op" onclick="backspaceCalc()">⌫</button>
+            <button class="calc-btn op" onclick="pressCalc('/')">÷</button>
+            <button class="calc-btn" onclick="pressCalc('7')">7</button>
+            <button class="calc-btn" onclick="pressCalc('8')">8</button>
+            <button class="calc-btn" onclick="pressCalc('9')">9</button>
+            <button class="calc-btn op" onclick="pressCalc('*')">×</button>
+            <button class="calc-btn" onclick="pressCalc('4')">4</button>
+            <button class="calc-btn" onclick="pressCalc('5')">5</button>
+            <button class="calc-btn" onclick="pressCalc('6')">6</button>
+            <button class="calc-btn op" onclick="pressCalc('-')">-</button>
+            <button class="calc-btn" onclick="pressCalc('1')">1</button>
+            <button class="calc-btn" onclick="pressCalc('2')">2</button>
+            <button class="calc-btn" onclick="pressCalc('3')">3</button>
+            <button class="calc-btn op" onclick="pressCalc('+')">+</button>
+            <button class="calc-btn" onclick="pressCalc('0')">0</button>
+            <button class="calc-btn" onclick="pressCalc('.')">.</button>
+            <button class="calc-btn equal" onclick="solveCalc()">=</button>
+        </div>
+    </div>
+
+    <div id="pricing-area">
+        <div class="grid-row">
+            <div class="input-group"><label>মজুরি (টাকা)</label><input type="number" id="wages" placeholder="উদাঃ 3000" oninput="calculate()"></div>
+            <div class="input-group"><label>ভ্যাট (%)</label><input type="number" id="vat" placeholder="উদাঃ 5" oninput="calculate()"></div>
+        </div>
+        <div class="result-box">
+            <div class="res-line"><span>মোট ওজন:</span> <span id="resVory" class="res-val">০-০-০-০</span></div>
+            <div class="res-line"><span>গ্রামে ওজন:</span> <span id="resGram" class="res-val">০.০০০ g</span></div>
+            <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+            <span id="resTotal" class="grand-total-val">০ BDT</span>
+        </div>
+        <button class="btn-copy" onclick="copyText()">হিসাব কপি করুন</button>
+    </div>
+</div>
+
+<footer>Created by <strong>SUBIR DATTA</strong></footer>
+
+<script>
+    let mode = 'vory-mode';
+    const UNIT_G = 11.664;
+
+    function showTab(t) {
+        mode = t;
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(t).classList.add('active');
+        event.currentTarget.classList.add('active');
+        
+        const isHidden = (t === 'conv-mode' || t === 'calc-mode');
+        document.getElementById('pricing-area').style.display = isHidden ? 'none' : 'block';
+        document.getElementById('market-rate-area').style.display = isHidden ? 'none' : 'block';
+        if(!isHidden) calculate();
+    }
+
+    function calculate() {
+        const r = parseFloat(document.getElementById('rate').value) || 0;
+        const w = parseFloat(document.getElementById('wages').value) || 0;
+        const v_pct = parseFloat(document.getElementById('vat').value) || 0;
+        let totalVory = 0;
+
+        if(mode === 'vory-mode') {
+            const v = parseFloat(document.getElementById('v').value) || 0;
+            const a = parseFloat(document.getElementById('a').value) || 0;
+            const rt = parseFloat(document.getElementById('r_t').value) || 0;
+            const p = parseFloat(document.getElementById('p').value) || 0;
+            totalVory = v + (a/16) + (rt/96) + (p/960);
+        } else if(mode === 'gram-mode') {
+            const g = parseFloat(document.getElementById('g_input').value) || 0;
+            totalVory = g / UNIT_G;
+        }
+
+        const totalGram = totalVory * UNIT_G;
+        const price = (totalVory * r) + w;
+        const finalPrice = price + (price * (v_pct/100));
+
+        document.getElementById('resGram').innerText = totalGram.toFixed(3) + " g";
+        document.getElementById('resVory').innerText = formatVory(totalVory);
+        document.getElementById('resTotal').innerText = Math.round(finalPrice).toLocaleString() + " BDT";
+    }
+
+    function formatVory(vory) {
+        if(vory <= 0) return "০-০-০-০";
+        let v = Math.floor(vory);
+        let a = Math.floor((vory - v) * 16);
+        let r = Math.floor(((vory - v) * 16 - a) * 6);
+        let p = Math.round((((vory - v) * 16 - a) * 6 - r) * 10);
+        return `${v}ভ-${a}আ-${r}র-${p}প`;
+    }
+
+    // Converter Logic
+    function convertG2V() {
+        const g = parseFloat(document.getElementById('g2v_in').value) || 0;
+        document.getElementById('g2v_out').innerText = g > 0 ? formatVory(g/UNIT_G) : "০-০-০-০";
+    }
+
+    function convertV2G() {
+        const v = parseFloat(document.getElementById('cv').value) || 0;
+        const a = parseFloat(document.getElementById('ca').value) || 0;
+        const r = parseFloat(document.getElementById('cr').value) || 0;
+        const p = parseFloat(document.getElementById('cp').value) || 0;
+        const totalVory = v + (a/16) + (r/96) + (p/960);
+        const resultG = totalVory * UNIT_G;
+        document.getElementById('v2g_out').innerText = resultG > 0 ? resultG.toFixed(3) + " g" : "০.০০০ g";
+    }
+
+    // --- COPY FUNCTIONS ---
+    function copyConv(id) {
+        const val = document.getElementById(id).innerText;
+        if(val.includes('০-০-০-০') || val.includes('০.০০০')) return;
+        navigator.clipboard.writeText(val);
+        alert("কপি হয়েছে: " + val);
+    }
+
+    function copyText() {
+        const text = `গোল্ড হিসাব (Subir Datta)\nওজন: ${document.getElementById('resVory').innerText}\nগ্রাম: ${document.getElementById('resGram').innerText}\nমোট দাম: ${document.getElementById('resTotal').innerText}`;
+        navigator.clipboard.writeText(text);
+        alert("পুরো হিসাব কপি হয়েছে!");
+    }
+
+    // Calculator JS
+    let calcExpression = "";
+    function pressCalc(val) { calcExpression += val; updateCalc(); }
+    function clearCalc() { calcExpression = ""; updateCalc("0"); }
+    function backspaceCalc() { calcExpression = calcExpression.slice(0, -1); updateCalc(); }
+    function updateCalc(alt) { document.getElementById('calc-display').innerText = calcExpression || alt || "0"; }
+    function solveCalc() {
+        try {
+            let res = new Function('return ' + calcExpression)();
+            calcExpression = Number.isInteger(res) ? res.toString() : res.toFixed(2).toString();
+            updateCalc();
+        } catch { clearCalc(); document.getElementById('calc-display').innerText = "Error"; }
+    }
+</script>
+</body>
+</html>
