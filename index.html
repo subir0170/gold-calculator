@@ -363,6 +363,11 @@
 <footer>Created by <strong>SUBIR DATTA</strong></footer>
 
 <script>
+    if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log("Service Worker Registered"))
+      .catch(err => console.log("Service Worker Failed", err));
+  }
     let mode = 'vory-mode';
     const UNIT_G = 11.664;
 
@@ -457,11 +462,7 @@
             updateCalc();
         } catch { clearCalc(); document.getElementById('calc-display').innerText = "Error"; }
     }
-    if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log("Service Worker Registered"))
-      .catch(err => console.log("Service Worker Failed", err));
-  }
+    
 </script>
 </body>
 </html>
